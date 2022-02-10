@@ -1,0 +1,20 @@
+---
+- name: Setup Unity-IdM conf directory
+  gather_facts: no
+  vars:
+    unityConf: "{{installationDir}}/conf/"
+  hosts: unity
+  tasks:
+  - name: Backup original distribution config 
+    command: mv "{{unityConf}}" "{{installationDir}}/conf-orig"
+
+  - name: Create conf dir
+    file:
+      state: directory
+      path: "{{unityConf}}"
+      mode: '0750'
+
+  - name: Setting up conf dir
+    synchronize:
+      src: "{{unity.confDir}}/"
+      dest: "{{unityConf}}"

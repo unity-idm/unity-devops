@@ -1,0 +1,10 @@
+---
+- name: Setup symlink to the current installed revision
+  gather_facts: no
+  hosts: unity
+  tasks:
+  - name: create current symlink
+    file:
+      state: link
+      src: "{{installationDirName}}"
+      dest: "{{runtimeAppDir}}"

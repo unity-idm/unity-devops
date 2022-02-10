@@ -1,0 +1,32 @@
+---
+- name: Initialize installation timestamp
+  hosts: local_only
+  tasks:
+  - name: Get installation timestamp
+    shell: "date +%Y%m%d-%H%M%S"
+    register: installTimestampResult
+  - name: Persist installation timestamp
+    set_fact:
+      installTimestamp: "{{ installTimestampResult.stdout }}"
+
+- import_playbook: setup-new-installation.yml
+  vars:
+    installTimestamp: "{{hostvars['localhost']['installTimestamp']}}" 
+
+- import_playbook: setup-conf.yml
+  when: unity.confDir is defined
+  vars:
+    installTimestamp: "{{hostvars['localhost']['installTimestamp']}}" 
+
+- import_playbook: setup-web-contents.yml
+  when: unity.webContentsDir is defined
+  vars:
+    installTimestamp: "{{hostvars['localhost']['installTimestamp']}}" 
+
+- import_playbook: setup-workspace.yml
+  vars:
+    installTimestamp: "{{hostvars['localhost']['installTimestamp']}}" 
+
+- import_playbook: setup-symlink.yml
+  vars:
+    installTimestamp: "{{hostvars['localhost']['installTimestamp']}}" 

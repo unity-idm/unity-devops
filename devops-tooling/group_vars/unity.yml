@@ -1,0 +1,12 @@
+
+installationDirName: "unity-server-{{unityVersion}}-{{installTimestamp}}"
+installationDir: "{{installDir}}/{{installationDirName}}"
+workspaceAppDir: "{{installDir}}/workspace"
+runtimeAppDirName: "current"
+runtimeAppDir: "{{installDir}}/{{runtimeAppDirName}}"
+
+serviceStartCmd: "bin/unity-idm-server-start"
+serviceStopCmd: "bin/unity-idm-server-stop"
+serviceURL: "https://{{unity.host}}:{{unity.port}}"
+healthCheckPath: "/console"
+

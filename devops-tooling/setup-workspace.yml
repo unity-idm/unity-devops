@@ -1,0 +1,16 @@
+---
+- name: Workspace setup
+  gather_facts: no
+  vars:
+    currentWorkspace: "{{runtimeAppDir}}/workspace/"
+  hosts: unity
+  tasks:
+
+  - name: Checking previous installation workspace
+    stat:
+      path: "{{currentWorkspace}}"
+    register: workspaceResult
+
+  - name: Copy workspace from previous installation
+    command: cp -r "{{currentWorkspace}}" "{{installationDir}}"
+    when: workspaceResult.stat.exists

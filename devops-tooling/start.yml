@@ -1,0 +1,21 @@
+---
+- name: Start Unity-IdM
+  hosts: unity
+  tasks:
+  - name: "start server"
+    command: "./{{serviceStartCmd}}"
+    args:
+      chdir: "{{runtimeAppDir}}"
+
+  - name:
+    debug:
+      msg: "url={{serviceURL}}{{healthCheckPath}}"
+
+  - name: "Wait for Unity-IdM to start"
+    uri:
+        url: "{{serviceURL}}{{healthCheckPath}}"
+        validate_certs: no
+    register: result
+    until: result.status == 200
+    retries: 300
+    delay: 1

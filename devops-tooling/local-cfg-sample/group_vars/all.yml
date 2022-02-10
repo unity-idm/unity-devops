@@ -1,0 +1,17 @@
+installDir: "{{inventory_dir}}/services"
+unityVersion: 3.8.1
+
+unity:
+  host: localhost
+  port: 2443
+  confDir: "{{inventory_dir}}/files/conf"
+  webContentsDir: "{{inventory_dir}}/files/webContents"
+
+backup:
+  dbDumps: "{{installDir}}/db_dumps"
+  db:
+    host: localhost
+    port: 12233
+    dbName: unity-db-name
+    username: db-username
+    password: db-password

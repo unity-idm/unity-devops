@@ -1,0 +1,31 @@
+---
+- name: Unity-IdM installation
+  gather_facts: no
+  hosts: unity
+  vars:
+    unityDistFile: unity-server-distribution-{{unityVersion}}-dist.tar.gz
+    downloadURL: https://sourceforge.net/projects/unity-idm/files/Unity%20server/{{unityVersion}}/{{unityDistFile}}/download
+    distributionFile: "{{workspaceAppDir}}/{{unityDistFile}}"
+  tasks:
+  - name: create workspace folder
+    file:
+      state: directory
+      path: "{{ workspaceAppDir }}"
+      mode: '0750'
+  
+  - import_tasks: download-tasks.yml
+
+  - name: create folder for current installation
+    file:
+      state: directory
+      path: "{{installationDir}}"
+      mode: '0750'
+
+  - name: Extract distribution
+    unarchive:
+      src: "{{distributionFile}}"
+      dest: "{{installationDir}}"
+      extra_opts: [--strip-components=1]
+
+
+

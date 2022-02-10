@@ -1,0 +1,8 @@
+---
+- name: Stop Unity-IdM
+  hosts: unity
+  tasks:
+  - name: "stop server"
+    command: "./{{serviceStopCmd}}"
+    args:
+      chdir: "{{runtimeAppDir}}"

@@ -1,0 +1,20 @@
+---
+- name: Setup Unity-IdM webContents directory
+  gather_facts: no
+  vars:
+    unityWebContents: "{{installationDir}}/webContents/"
+  hosts: unity
+  tasks:
+  - name: Backup original distribution webContents 
+    command: mv "{{unityWebContents}}" "{{installationDir}}/webContents-orig"
+
+  - name: Create webContents dir
+    file:
+      state: directory
+      path: "{{unityWebContents}}"
+      mode: '0750'
+
+  - name: Setting up webContents dir
+    synchronize:
+      src: "{{unity.webContentsDir}}/"
+      dest: "{{unityWebContents}}"
