@@ -1,0 +1,14 @@
+---
+- name: Restore Unity-IdM database
+  hosts: unity
+  tasks:
+  - name: Restore database
+    mysql_db:
+      state: import
+      login_host: "{{ backup.db.host }}"
+      login_port: "{{ backup.db.port }}"
+      login_user: "{{ backup.db.username }}"
+      login_password: "{{ backup.db.password }}"
+      name: "{{ backup.db.dbName }}"
+      target: "{{ backupFilePath }}"
+

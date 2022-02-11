@@ -1,0 +1,9 @@
+---
+- name: Setup version file
+  gather_facts: no
+  hosts: unity
+  tasks:
+  - name: Creating version file
+    copy:
+      dest: "{{ runtimeVersionFile }}"
+      content: "{{ unityVersion }}"

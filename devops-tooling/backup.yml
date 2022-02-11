@@ -1,0 +1,5 @@
+---
+- import_playbook: backup-mysql.yml
+  when: backup.db.dialect == 'mysql'
+
+

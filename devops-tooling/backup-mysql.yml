@@ -1,0 +1,24 @@
+---
+- import_playbook: get-current-unity-ver.yml
+
+- name: Backup Unity-IdM database
+  hosts: unity
+  tasks:
+  - name: "Set timestamp of the backup"
+    set_fact:
+      now: "{{ lookup('pipe', 'date +%F_%T') }}"
+  - name: create backup folder
+    file:
+      state: directory
+      path: "{{ backup.dbDumps }}"
+      mode: '0750'
+  - name: Backup database
+    mysql_db:
+      state: dump
+      login_host: "{{ backup.db.host }}"
+      login_port: "{{ backup.db.port }}"
+      login_user: "{{ backup.db.username }}"
+      login_password: "{{ backup.db.password }}"
+      name: "{{ backup.db.dbName }}"
+      target: "{{ backup.dbDumps }}/unitydb-v{{currentUnityVer}}-{{now}}.gz"
+

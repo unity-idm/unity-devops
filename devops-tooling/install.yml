@@ -30,3 +30,7 @@
 - import_playbook: setup-symlink.yml
   vars:
     installTimestamp: "{{hostvars['localhost']['installTimestamp']}}" 
+
+- import_playbook: setup-version-file.yml
+  vars:
+    installTimestamp: "{{hostvars['localhost']['installTimestamp']}}" 

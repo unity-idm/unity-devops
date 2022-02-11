@@ -10,8 +10,9 @@ unity:
 backup:
   dbDumps: "{{installDir}}/db_dumps"
   db:
+    dialect: mysql
     host: localhost
-    port: 12233
-    dbName: unity-db-name
-    username: db-username
-    password: db-password
+    port: 3306
+    dbName: unity-database-name
+    username: username
+    password: password

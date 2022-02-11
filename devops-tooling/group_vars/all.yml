@@ -1,1 +1,3 @@
-
+runtimeAppDirName: "current"
+runtimeAppDir: "{{installDir}}/{{runtimeAppDirName}}"
+runtimeVersionFile: "{{runtimeAppDir}}/UNITY.VER"

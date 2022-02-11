@@ -1,0 +1,7 @@
+---
+- name: Determine current runtime Unity-IdM version
+  hosts: unity
+  tasks:
+  - name: Read version file
+    set_fact:
+      currentUnityVer: "{{ lookup('file', runtimeVersionFile) }}"
