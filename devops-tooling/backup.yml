@@ -2,4 +2,7 @@
 - import_playbook: backup-mysql.yml
   when: backup.db.dialect == 'mysql'
 
+- import_playbook: backup-mysqldump.yml
+  when: backup.db.dialect == 'mysqldump'
+
 
