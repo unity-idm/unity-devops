@@ -1,22 +1,25 @@
 ---
-- import_playbook: get-current-unity-ver.yml
-
 - name: Backup Unity-IdM database
-  hosts: unity
-  vars:
-    targetSQLFile: "{{ backup.dbDumps }}/unitydb-v{{currentUnityVer}}-{{now}}.sql"
+  hosts: db
   tasks:
-  - name: "Set timestamp of the backup"
-    set_fact:
+  - set_fact:
       now: "{{ lookup('pipe', 'date +%F_%T') }}"
-  - name: create backup folder
-    file:
-      state: directory
-      path: "{{ backup.dbDumps }}"
-      mode: '0750'
+  - set_fact:
+      targetSQLFile: "/tmp/unitydb-v{{ currentUnityVer }}-{{ now }}.sql"
+
   - name: Dump database SQL
     shell: mysqldump --set-gtid-purged=OFF --no-tablespaces -u {{backup.db.username}} -p"{{backup.db.password}}" -h {{backup.db.host}} --port {{backup.db.port}} {{ backup.db.dbName }} > {{targetSQLFile}}
 
   - name: Compress SQL backup file
-    command: gzip {{targetSQLFile}}
+    command: gzip {{ targetSQLFile }}
 
+  - name: Store database backup on management host
+    fetch:
+      src: "{{ targetSQLFile }}.gz"
+      dest: "{{ backup.dbDumps }}/"
+      flat: yes
+  
+  - name: Delete backup file on db host
+    file:
+      state: absent
+      path: "{{ targetSQLFile }}.gz"

@@ -1,14 +1,25 @@
 ---
 - name: Restore Unity-IdM database
-  hosts: unity
+  hosts: db
   tasks:
-  - name: Restore database
-    mysql_db:
-      state: import
-      login_host: "{{ backup.db.host }}"
-      login_port: "{{ backup.db.port }}"
-      login_user: "{{ backup.db.username }}"
-      login_password: "{{ backup.db.password }}"
-      name: "{{ backup.db.dbName }}"
-      target: "{{ backupFilePath }}"
+  - set_fact:
+      backupFileOnDBHostPath: "/tmp/{{ backupFilePath | basename }}"
+  - set_fact:
+      targetSQLFileOnDbHost: "{{ backupFileOnDBHostPath | replace('.gz','') }}"
+
+  - name: Copy backup file to db host
+    copy:
+      src: "{{ backupFilePath }}"
+      dest: "{{ backupFileOnDBHostPath }}"
+  
+  - name: Deompress backup file
+    command: gunzip {{ backupFileOnDBHostPath }}
+
+  - name: Restore {{ backup.db.dbName }} database
+    shell: mysql -u {{backup.db.username}} -p"{{backup.db.password}}" -h {{backup.db.host}} --port {{backup.db.port}} {{ backup.db.dbName }} < {{targetSQLFileOnDbHost}}
+    
+  - name: Delete backup file on db host
+    file:
+      state: absent
+      path: "{{ targetSQLFileOnDbHost }}"
 

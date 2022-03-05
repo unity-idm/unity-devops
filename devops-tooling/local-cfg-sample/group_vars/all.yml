@@ -8,9 +8,9 @@ unity:
   webContentsDir: "{{inventory_dir}}/files/webContents"
 
 backup:
-  dbDumps: "{{installDir}}/db_dumps"
+  dbDumps: "{{inventory_dir}}/db_dumps"
   db:
-    dialect: mysql
+    backupMethod: mysql-native-cmds # or ansible-native-mysql
     host: localhost
     port: 3306
     dbName: unity-database-name

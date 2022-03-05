@@ -8,6 +8,8 @@
 [unity]
 local-unity             ansible_host=<unity-host> 
 
+[db]
+unity-db                ansible_connection=<database-host> 
 
 ################################################################################
 # Do not edit below this line

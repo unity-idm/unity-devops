@@ -1,6 +1,9 @@
 [unity]
 local-unity             ansible_connection=local 
 
+[db]
+unity-db                ansible_connection=local 
+
 #######################################
 # Do not edit below this line
 #######################################

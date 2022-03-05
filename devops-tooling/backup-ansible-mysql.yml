@@ -1,0 +1,29 @@
+---
+- name: Backup Unity-IdM database
+  hosts: db
+  tasks:  
+  - set_fact:
+      now: "{{ lookup('pipe', 'date +%F_%T') }}"
+  - set_fact:
+      targetBackupFile: "/tmp/unitydb-v{{ currentUnityVer }}-{{ now }}.sql.gz"
+
+  - name: Performing database backup on db host
+    mysql_db:
+      state: dump
+      login_host: "{{ backup.db.host }}"
+      login_port: "{{ backup.db.port }}"
+      login_user: "{{ backup.db.username }}"
+      login_password: "{{ backup.db.password }}"
+      name: "{{ backup.db.dbName }}"
+      target: "{{ targetBackupFile }}"
+
+  - name: Store database backup on management host
+    fetch:
+      src: "{{ targetBackupFile }}"
+      dest: "{{ backup.dbDumps }}/"
+      flat: yes
+
+  - name: Delete backup file on db host
+    file:
+      state: absent
+      path: "{{ targetBackupFile }}"

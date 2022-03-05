@@ -1,7 +1,19 @@
 ---
-- name: Determine current runtime Unity-IdM version
+- name: Fetch Unity-IdM version file
   hosts: unity
+  tasks:
+  - fetch:
+      src: "{{runtimeVersionFile}}"
+      dest: "{{inventory_dir}}/group_vars/"
+      flat: yes
+
+- name: Determine current runtime Unity-IdM version
+  hosts: local_only
+  vars:
+    localCopyOfUnityVersionFile: "{{inventory_dir}}/group_vars/{{runtimeVersionFile | basename}}"
   tasks:
   - name: Read version file
     set_fact:
-      currentUnityVer: "{{ lookup('file', runtimeVersionFile) }}"
+      currentUnityVer: "{{ lookup('file', localCopyOfUnityVersionFile) }}"
+  - debug: 
+      msg: "Installed Unity-IdM version: {{hostvars['localhost']['currentUnityVer']}}"

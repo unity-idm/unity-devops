@@ -1,0 +1,25 @@
+---
+- name: Restore Unity-IdM database
+  hosts: db
+  vars:
+    backupFileOnDBHostPath: "/tmp/{{ backupFilePath | basename }}"
+  tasks:
+  - name: Copy backup file to db host
+    copy:
+      src: "{{ backupFilePath }}"
+      dest: "{{ backupFileOnDBHostPath }}"
+
+  - name: Restore database
+    mysql_db:
+      state: import
+      login_host: "{{ backup.db.host }}"
+      login_port: "{{ backup.db.port }}"
+      login_user: "{{ backup.db.username }}"
+      login_password: "{{ backup.db.password }}"
+      name: "{{ backup.db.dbName }}"
+      target: "{{ backupFileOnDBHostPath }}"
+
+  - name: Delete backup file on db host
+    file:
+      state: absent
+      path: "{{ backupFileOnDBHostPath }}"

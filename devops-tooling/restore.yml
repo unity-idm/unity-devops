@@ -1,8 +1,8 @@
 ---
-- import_playbook: restore-mysql.yml
-  when: backup.db.dialect == 'mysql'
+- import_playbook: restore-ansible-mysql.yml
+  when: backup.db.backupMethod == 'ansible-native-mysql'
 
-- import_playbook: restore-mysqldump.yml
-  when: backup.db.dialect == 'mysqldump'
+- import_playbook: restore-mysql.yml
+  when: backup.db.backupMethod == 'mysql-native-cmds'
 
 

@@ -1,8 +1,14 @@
 ---
-- import_playbook: backup-mysql.yml
-  when: backup.db.dialect == 'mysql'
+- import_playbook: get-current-unity-ver.yml
+
+- import_playbook: backup-ansible-mysql.yml
+  vars:
+    currentUnityVer: "{{hostvars['localhost']['currentUnityVer']}}" 
+  when: backup.db.backupMethod == 'ansible-native-mysql'
 
 - import_playbook: backup-mysqldump.yml
-  when: backup.db.dialect == 'mysqldump'
+  vars:
+    currentUnityVer: "{{hostvars['localhost']['currentUnityVer']}}" 
+  when: backup.db.backupMethod == 'mysql-native-cmds'
 
 
