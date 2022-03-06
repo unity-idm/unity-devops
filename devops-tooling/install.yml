@@ -27,6 +27,10 @@
   vars:
     installTimestamp: "{{hostvars['localhost']['installTimestamp']}}" 
 
+- import_playbook: setup-scss.yml
+  vars:
+    installTimestamp: "{{hostvars['localhost']['installTimestamp']}}" 
+
 - import_playbook: setup-symlink.yml
   vars:
     installTimestamp: "{{hostvars['localhost']['installTimestamp']}}" 

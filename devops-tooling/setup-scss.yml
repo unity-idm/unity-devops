@@ -1,0 +1,22 @@
+---
+- name: Setup styles
+  gather_facts: no
+  vars:
+    currentBin: "{{runtimeAppDir}}/bin/"
+  hosts: unity
+  tasks:
+
+  - name: Find all styles.scss files
+    find:
+      paths: "{{runtimeAppDir}}/webContents"
+      recurse: yes
+      patterns: "styles.scss"
+      file_type: file
+    register: stylesFiles
+
+  - name: Compile scss
+    shell: "{{ currentBin }}/unity-idm-scss-compile {{ item.path | replace('styles.scss', '')}}"
+    args:
+      chdir: "{{ currentBin }}"
+    with_items: "{{ stylesFiles.files }}"
+    
