@@ -10,7 +10,7 @@ unity:
 backup:
   dbDumps: "{{inventory_dir}}/db_dumps"
   db:
-    backupMethod: mysql-native-cmds # or ansible-native-mysql
+    backupMethod: mysql-native-cmds # or ansible-native-mysql, ansible-native-postgresql
     host: localhost
     port: 3306
     dbName: unity-database-name

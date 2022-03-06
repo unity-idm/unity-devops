@@ -1,0 +1,32 @@
+---
+- name: Restore Unity-IdM database
+  hosts: db
+  vars:
+  tasks:
+  - set_fact:
+      backupFileOnDBHostPath: "/tmp/{{ backupFilePath | basename }}"
+  - set_fact:
+      dbDumpTARFilePath: "{{ backupFileOnDBHostPath | replace('.gz', '') }}"
+
+  - name: Copy backup file to db host
+    copy:
+      src: "{{ backupFilePath }}"
+      dest: "{{ backupFileOnDBHostPath }}"
+
+  - shell: gunzip {{ backupFileOnDBHostPath }}
+
+  - name: "Restore database"
+    postgresql_db:
+      state: restore
+      login_host: "{{ backup.db.host }}"
+      port: "{{ backup.db.port }}"
+      login_user: "{{ backup.db.username }}"
+      login_password: "{{ backup.db.password }}"
+      name: "{{ backup.db.dbName }}"
+      target: "{{ dbDumpTARFilePath }}"
+      target_opts: "--clean --if-exists"
+
+  - name: Delete backup file on db host
+    file:
+      state: absent
+      path: "{{ dbDumpTARFilePath }}"

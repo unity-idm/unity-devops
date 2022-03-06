@@ -11,4 +11,9 @@
     currentUnityVer: "{{hostvars['localhost']['currentUnityVer']}}" 
   when: backup.db.backupMethod == 'mysql-native-cmds'
 
+- import_playbook: backup-ansible-psql.yml
+  vars:
+    currentUnityVer: "{{hostvars['localhost']['currentUnityVer']}}" 
+  when: backup.db.backupMethod == 'ansible-native-psql'
+
 

@@ -5,4 +5,6 @@
 - import_playbook: restore-mysql.yml
   when: backup.db.backupMethod == 'mysql-native-cmds'
 
+- import_playbook: restore-ansible-psql.yml
+  when: backup.db.backupMethod == 'ansible-native-psql'
 
