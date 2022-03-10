@@ -1,0 +1,45 @@
+---
+- name: Check status of Unity-IdM
+  hosts: unity
+  vars:
+    unityPidFile: "{{runtimeAppDir}}/unity-idm-server.pid"
+  tasks:
+      
+  - name: "Read PID"
+    shell: "cat {{unityPidFile}} 2>/dev/null"
+    register: pidFileResult
+    failed_when: false
+    no_log: True
+
+  - set_fact:
+      unityPID: "{{pidFileResult.stdout_lines | join }}"
+
+  - name: Checking if process is running
+    shell: "ps -p {{unityPID}}"
+    register: pidStatus
+    failed_when: false
+    no_log: True
+
+  - name: "Checking Console UI"
+    uri:
+        url: "{{serviceURL}}{{healthCheckPath}}"
+        validate_certs: no
+    register: httpQueryResult
+
+  - set_fact:
+      message: []
+  - set_fact: 
+      message: "{{message}} + ['Unity-IdM process is running']"
+    when: pidStatus.rc == 0
+  - set_fact: 
+      message: "{{message}} + ['Console endpoint is accessible']"
+    when: pidStatus.rc == 0 and httpQueryResult.status == 200
+  - set_fact: 
+      message: "{{message}} + ['Console endpoint is not accessible']"
+    when: pidStatus.rc == 0 and httpQueryResult.status != 200
+  - set_fact:
+      message: "{{message}} + ['Unity-IdM process is not running']"
+    when: pidStatus.rc != 0
+
+  - debug: 
+      msg: "{{message}}"
