@@ -4,6 +4,6 @@ workspaceAppDir: "{{installDir}}/workspace"
 
 serviceStartCmd: "bin/unity-idm-server-start"
 serviceStopCmd: "bin/unity-idm-server-stop"
-serviceURL: "https://{{unity.host}}:{{unity.port}}"
+serviceURL: "https://{{unity.connectivityCheckHost}}"
 healthCheckPath: "/console"
 

@@ -18,3 +18,4 @@
     synchronize:
       src: "{{unity.webContentsDir}}/"
       dest: "{{unityWebContents}}"
+      mode: push

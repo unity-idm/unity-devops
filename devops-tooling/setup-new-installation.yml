@@ -26,6 +26,7 @@
       src: "{{distributionFile}}"
       dest: "{{installationDir}}"
       extra_opts: [--strip-components=1]
+      remote_src: yes
 
 
 

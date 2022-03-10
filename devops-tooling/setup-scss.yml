@@ -2,13 +2,13 @@
 - name: Setup styles
   gather_facts: no
   vars:
-    currentBin: "{{runtimeAppDir}}/bin/"
+    currentBin: "{{installationDir}}/bin/"
   hosts: unity
   tasks:
 
   - name: Find all styles.scss files
     find:
-      paths: "{{runtimeAppDir}}/webContents"
+      paths: "{{installationDir}}/webContents"
       recurse: yes
       patterns: "styles.scss"
       file_type: file

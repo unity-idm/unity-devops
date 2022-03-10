@@ -18,3 +18,4 @@
     synchronize:
       src: "{{unity.confDir}}/"
       dest: "{{unityConf}}"
+      mode: push
