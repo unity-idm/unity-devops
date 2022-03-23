@@ -1,4 +1,4 @@
-installDir: "{{inventory_dir}}/services"
+installDir: "{{inventory_dir}}/service"
 unityVersion: 3.8.1
 
 unity:
