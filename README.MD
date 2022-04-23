@@ -1,7 +1,7 @@
 
 # Introduction
-In this documentation you'll find how to install and manage Unity-IdM instance throught dedicated Ansible scripts.
-The concept is to have configuration of Unity-IdM externalized in a dedicated directories, and utilzie those during the installation. In practice this means that software is downloaded, staged, and externalized configuration applied during installation. 
+In this documentation you'll find how to install and manage Unity-IdM instance through dedicated Ansible scripts.
+The concept is to have configuration of Unity-IdM externalized in a dedicated directories, and utilize those during the installation. In practice this means that software is downloaded, staged, and externalized configuration applied during installation. 
 
 Note that externalized configuration is placed on Ansible management host, which can be different from the actual Unity-IdM instance.
 
@@ -10,18 +10,26 @@ Ansible scripts with 2.9 version.
 
 Note that the Ansible scripts handles operations on Unity-IdM instance only. The database of your choice selected for Unity-IdM needs to be installed, configured and available upfront. 
 
+## Ansible requirements
+In case PostgreSQL database is used for the Unity-IdM installation, the following Python requirements are needed on the host on which a database backup is performed:
+* psycopg2
+
+When MySQL is used, then the following requirements are needed on the host on which a database backup is performed:
+* MySQLdb (Python 2.x)
+* PyMySQL (Python 2.7 and Python 3.X), or
+* mysql (command line binary)
+* mysqldump (command line binary)
+
 # Ansible deliverables
 
-The `devops-tooling` directory contains the Ansibe playbooks, which realizes the following operations:
+The `devops-tooling` directory contains the Ansible playbooks, which realizes the following operations:
 * Unity-IdM installation in given version,
-* databse backup and restore,
+* database backup and restore,
 * start and stop the Unity-IdM instance
 * check status of instance, whether it is running or not
 
 The aforementioned directory contains also example of Ansible configuration files stored in `devops-tooling/cfg-sample`.
 
-# Ansible dependencies
-TBD
 
 # Installation and configuration of devops tooling
 Download the `devops-tooling` directory into your Ansible management host. For the sake of the simplicity, let's assume that installation of devops tooling was done in `$HOME/unity-devops` directory. Next, create the inventory and group variables files in the aforementioned directory. You can base on the example files that are delivered with the Ansible tooling.
@@ -35,9 +43,14 @@ With regards to the inventory file, depending upon whether you are going to inst
 > cp devops-tooling/cfg-sample/group_vars/all.yml group_vars/
 ```
 
-The following files should be copied to the current directory:
-* `inventory`
-* `group_vars/all.yml`
+Here is the intended directories organization, once steps in this section are completed:
+```
+$HOME/unity-devops   - root directory with devops tooling
+  |_ devops-tooling  - downloaded Unity-IdM Ansible tooling
+  |_ inventory       - Ansible inventory file
+  |_ group_vars
+       |_ all.yml    - Ansible group variable file
+```
 
 ## Inventory
 Ansible can work against multiple machines in your infrastructure. It does this by selecting systems listed in Ansible’s inventory file. Make appropriate changes to the copied example of inventory file.
@@ -49,7 +62,7 @@ The following table provides description of all configuration options.
 | --- | --- | --- |
 | `installDir` | filesystem path on Unity-IdM host | Directory name where Unity-IdM instance will be installed e.g. `{{inventory_dir}}/service`
 | `unityVersion` | string | Version of Unity-IdM software that will be installed e.g. `3.8.2` |
-| `unity.connectivityCheckHost` | string | The hostname or IP address with port of the Unity-IdM e.g. `localhost:2443`. This is be used by Ansible scripts to query the Unity-IdM via HTTP to verify if the instance is up and running.
+| `unity.connectivityCheckHost` | string | The hostname or IP address with port of the Unity-IdM e.g. `localhost:2443`. This is used by Ansible scripts to query the Unity-IdM via HTTP to verify if the instance is up and running.
 | `unity.confDir` | filesystem path on Ansible management host | Content of this directory will be deployed to the installed Unity-IdM under `conf` directory.
 | `unity.webContentsDir` | filesystem path on Ansible management host | Content of this directory will be deployed to the installed Unity-IdM under `webContents` directory.
 | `backup.dbDumps` | filesystem path on Ansible management host | Place on the Ansible management host where database bacups are stored.
@@ -63,14 +76,43 @@ The following table provides description of all configuration options.
 
 # Operations
 
-This section describes in detail implemented in Ansible scripts operations to achive varius activites.
+This section describes in detail implemented in Ansible scripts operations to achieve various activities.
 For the sake of the simplicity, let's assume that `installDir` Ansible group variable is set to `$HOME/unity-devops/service` value.
-Note that all Ansible playbook executions in this section are performed in on management host in the directory where the tooling was installed.
+Note that all Ansible playbook executions in this section are performed on management host in the directory where the tooling was installed.
 
-## Operating the system
+## Installation
+
+### Prepare Unity-IdM configuration
+Before running the Ansible script to do the actual installation, prepare the directories on the management host with externalized Unity-IdM configuration:
+
+* create directory with configuration files that will be deployed as `conf` directory to the Unity-IdM instance, and set the `unity.confDir` parameter in the Ansible group variable file,
+* create directory with web contents that will be deployed as `webContents` directory to the Unity-IdM instance, and set the `unity.webContentsDir` parameter in the Ansible group variable file
+
+Assuming the following directories organization:
+```
+$HOME/unity-devops   - root directory with devops tooling
+  |_ devops-tooling  - downloaded Unity-IdM Ansible tooling
+  |_ inventory       - Ansible inventory file
+  |_ group_vars
+       |_ all.yml    - Ansible group variable file
+  |_ unity-config
+      |_ conf        - configuration files
+      |_ webContents - web contents
+```
+Configure the Ansible group variable values as follows:
+* set `unity.confDir` with `{{inventory_dir}}/unity-config/conf` value,
+* set `unity.webContentsDir` with `{{inventory_dir}}/unity-config/webContents` value
+
+
+### Unity-IdM installation
+
+Set the Unity-IdM version of your choice in Ansible group variable file under `unityVersion` parameter, execute:
+```
+ansible-playbook -i inventory devops-tooling/install.yml
+```
 
 ### Installation placement
-The Unity-IdM is deployed on the host which was pointed out int he inventory file.
+The Unity-IdM is deployed on the host which was pointed out in the inventory file.
 The installation is placed in `$HOME/unity-devops/service` directory, which consists of Unity-IdM software directories, a link that points to the current working instance, and a workspace with downloaded Unity-IdM packages e.g.
 ```
 > ls $HOME/unity-devops/service
@@ -79,6 +121,9 @@ unity-server-3.8.2-20220310-063537
 unity-server-3.8.2-20220310-063712
 workspace
 ```
+
+
+## Operating the system
 
 ### Start instance
 ```
@@ -95,7 +140,7 @@ ansible-playbook -i inventory devops-tooling/stop.yml
 ansible-playbook -i inventory devops-tooling/status.yml
 ```
 
-### Changing coniguration
+### Changing configuration
 Unity-IdM configuration is stored in the directory configured under `unity.confDir` Ansible group variable. In case where a new configuration needs to be applied, operator must change the configuration files on Ansible management host, and then install Unity-IdM - please follow the [Procedure to update Unity-IdM](#update-procedure).
 
 
@@ -111,13 +156,8 @@ ansible-playbook -i inventory devops-tooling/restore.yml --extra-vars "backupFil
 ```
 The `backupFilePath` is the full path to the database dump file.
 
-## Installation
-Set the Unity-IdM version of your choice in Ansible group variable file under `unityVersion` parameter, execute:
-```
-ansible-playbook -i inventory devops-tooling/install.yml
-```
-
 ## Procedure to update Unity-IdM <a id='#update-procedure'></a>
+Assuming that Unity-IdM has already been installed with help of devops tooling, you can update this instance to the version of your choice. This section provides steps to achieve this.
 
 1. Make a backup of current version, execute:
     ```
@@ -131,7 +171,7 @@ ansible-playbook -i inventory devops-tooling/install.yml
 
 3. From this point, it is possible to either install new Unity-IdM version, or update the configuration, or both:
     * to install new version: change `unityVersion` variable in Ansible group files,
-    * to change configuration update files stored in directory configured under `unity.confDir` or `unity.webContentsDir` Andible group file
+    * to change configuration update files stored in directory configured under `unity.confDir` or `unity.webContentsDir` Ansible group file
 
     Once above is done, execute:
     ```
@@ -146,8 +186,8 @@ ansible-playbook -i inventory devops-tooling/install.yml
 5. Verify Unity-IdM logs.
 
 
-
 ## Rollback procedure
+In case Unity-IdM update was not successful, you can rollback installation to the previous version. Below is the procedure to achieve this.
 
 1. Stop current instance, execute:
     ```
@@ -159,7 +199,7 @@ ansible-playbook -i inventory devops-tooling/install.yml
     ansible-playbook -i inventory devops-tooling/restore.yml --extra-vars "backupFilePath=$HOME/unity-devops/db-dumps/db_dumps/unitydb-v3.8.2-2022-03-07_07:39:59.sql.gz"
     ```
 
-3. Install prev version: change `unityVersion` parameter in Ansible Group variable file, and execute:
+3. Install previous version: change `unityVersion` parameter in Ansible Group variable file, and execute:
     ```
     ansible-playbook -i inventory devops-tooling/install.yml
     ```
