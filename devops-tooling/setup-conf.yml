@@ -1,21 +1,55 @@
 ---
 - name: Setup Unity-IdM conf directory
   gather_facts: no
-  vars:
-    unityConf: "{{installationDir}}/conf/"
   hosts: unity
-  tasks:
-  - name: Backup original distribution config 
-    command: mv "{{unityConf}}" "{{installationDir}}/conf-orig"
+  vars:
+    unityTargetConfDir: "{{installationDir}}/conf/"
+    unitySourceConfDir: "{{unity.confDir}}"
 
-  - name: Create conf dir
+  tasks:
+
+  - name: Backup original distribution config 
+    command: mv "{{unityTargetConfDir}}" "{{installationDir}}/conf-orig"
+
+  - name: Create target conf dir
     file:
       state: directory
-      path: "{{unityConf}}"
+      path: "{{unityTargetConfDir}}"
       mode: '0750'
 
-  - name: Setting up conf dir
-    synchronize:
-      src: "{{unity.confDir}}/"
-      dest: "{{unityConf}}"
-      mode: push
+  - name: Create extra target conf directories
+    file:
+      state: directory
+      path: "{{unityTargetConfDir}}/{{item.path}}"
+      mode: '0750'
+    with_filetree:
+      - "{{unitySourceConfDir}}"
+    when: item.state == 'directory'
+
+  - name: Register source conf file stats
+    stat:
+      path: "{{item.src}}"
+    with_filetree:
+      - "{{unitySourceConfDir}}"
+    when: item.state == 'file'
+    register: files_stats
+
+  - name: Copy template config files to target instance
+    template:
+      src: "{{item.item.src}}"
+      dest: "{{unityTargetConfDir}}/{{item.item.path}}"
+    with_items: "{{ files_stats.results }}"
+    when: 
+      - "'stat' in item"
+      - item.stat.charset != 'binary'
+      - not item.stat.path.endswith('.pem')
+      - not item.stat.path.endswith('log4j2.xml')
+
+  - name: Copy non template config files to target instance
+    copy:
+      src: "{{item.item.src}}"
+      dest: "{{unityTargetConfDir}}/{{item.item.path}}"
+    with_items: "{{ files_stats.results }}"
+    when:
+      - "'stat' in item"
+      - item.stat.charset == 'binary' or item.stat.path.endswith('.pem') or item.stat.path.endswith('log4j2.xml')
