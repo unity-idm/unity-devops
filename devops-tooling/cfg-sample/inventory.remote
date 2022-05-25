@@ -1,15 +1,8 @@
-################################################################################
-# Inventory file with an example of how to configure remote hosts for FURMS 
-# system components.
-# NOTE: the ansible_host below should be set to the name of the host to 
-# connect to.
-################################################################################
-
 [unity]
 local-unity             ansible_host=<unity-host> 
 
 [db]
-unity-db                ansible_connection=<database-host> 
+unity-db                ansible_host=<database-host> 
 
 ################################################################################
 # Do not edit below this line
