@@ -103,6 +103,36 @@ Configure the Ansible group variable values as follows:
 * set `unity.confDir` with `{{inventory_dir}}/unity-config/conf` value,
 * set `unity.webContentsDir` with `{{inventory_dir}}/unity-config/webContents` value
 
+### Using Ansible variables in configuration files
+
+The Unity-IdM configuration files pointed in `unity.confDir` setting, are considered as Ansible template files. This opens up a possibility to use Ansible variables in configuration files, so once they are deployed to target instance, variables are resolved to values set up in Ansible.  
+
+Example: let's say you would like to have the `unityServer.core.httpServer.advertisedHost` configuration value, which is located in `unityServer.conf` file, to be dynamically set after deployment to the value configured in some Ansible variable. First, you have to introduce new variables in `group_vars/all.yml` file e.g.:
+
+```
+...
+httpServer:
+  advertisedHost: my.domain.com
+...
+
+```
+
+Then use this variable in the `unityServer.conf` file as follows:
+```
+...
+unityServer.core.httpServer.advertisedHost={{httpServer.advertisedHost}}
+...
+
+```
+
+And after installation, the  `unityServer.conf` file will look like:
+```
+...
+unityServer.core.httpServer.advertisedHost=my.domain.com
+...
+
+```
+
 
 ### Unity-IdM installation
 
