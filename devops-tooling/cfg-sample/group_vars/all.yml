@@ -5,6 +5,8 @@ unity:
   connectivityCheckHost: localhost:2443
   confDir: "{{inventory_dir}}/files/conf"
   webContentsDir: "{{inventory_dir}}/files/webContents"
+  extraDirs: 
+    - "{{inventory_dir}}/files/lib-extra"
 
 backup:
   dbDumps: "{{inventory_dir}}/db_dumps"

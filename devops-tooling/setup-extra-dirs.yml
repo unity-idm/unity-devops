@@ -1,0 +1,8 @@
+---
+- name: Setup Unity-IdM instance with extra directories
+  gather_facts: no
+  hosts: unity
+  tasks:
+  - name: Setup extra directory in target instance
+    include_tasks: setup-extra-dir.yml
+    loop: "{{unity.extraDirs}}"

@@ -16,7 +16,13 @@
 - import_playbook: setup-conf.yml
   when: unity.confDir is defined
   vars:
+    installTimestamp: "{{hostvars['localhost']['installTimestamp']}}"
+
+- import_playbook: setup-extra-dirs.yml
+  when: unity.extraDirs is defined
+  vars:
     installTimestamp: "{{hostvars['localhost']['installTimestamp']}}" 
+ 
 
 - import_playbook: setup-web-contents.yml
   when: unity.webContentsDir is defined

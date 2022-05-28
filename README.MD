@@ -63,8 +63,9 @@ The following table provides description of all configuration options.
 | `installDir` | filesystem path on Unity-IdM host | Directory name where Unity-IdM instance will be installed e.g. `{{inventory_dir}}/service`
 | `unityVersion` | string | Version of Unity-IdM software that will be installed e.g. `3.8.2` |
 | `unity.connectivityCheckHost` | string | The hostname or IP address with port of the Unity-IdM e.g. `localhost:2443`. This is used by Ansible scripts to query the Unity-IdM via HTTP to verify if the instance is up and running.
-| `unity.confDir` | filesystem path on Ansible management host | Content of this directory will be deployed to the installed Unity-IdM under `conf` directory.
-| `unity.webContentsDir` | filesystem path on Ansible management host | Content of this directory will be deployed to the installed Unity-IdM under `webContents` directory.
+| `unity.confDir` | filesystem path on Ansible management host | Content of this directory will be deployed to the installed Unity-IdM under `conf` directory. This configuration option is optional.
+| `unity.webContentsDir` | filesystem path on Ansible management host | Content of this directory will be deployed to the installed Unity-IdM under `webContents` directory. This configuration option is optional.
+| `unity.extraDirs` | list of filesystem paths on Ansible management host | Content of pointed out directories will be deployed to the installed Unity-IdM instance to directories with names taken from paths' basename. This configuration option is optional.
 | `backup.dbDumps` | filesystem path on Ansible management host | Place on the Ansible management host where database bacups are stored.
 | `backup.db.backupMethod` | string | Defines a method of performing database backup (and restore). <br> Possible values:  <ul><li>`mysql-native-cmds` - operations are perform using native MySQL commands like `mysqldump` & `mysql`</li> <li>`ansible-native-mysql` - the [mysql_db](https://docs.ansible.com/devops-tooling/2.9/modules/mysql_db_module.html) Ansible module is utilized for backup and restore operations</li><li>`ansible-native-postgresql` - the [postgresql_db](https://docs.ansible.com/devops-tooling/2.9/modules/postgresql_db_module.html) Ansible module is utilized for backup and restore operations</li></ul> Note: the supported backup method for instances running with MariaDB is `ansible-native-mysql`.
 | `backup.db.host` | string | The hostname or IP address of a host where database instance is running.
@@ -83,12 +84,13 @@ Note that all Ansible playbook executions in this section are performed on manag
 ## Installation
 
 ### Prepare Unity-IdM configuration
-Before running the Ansible script to do the actual installation, prepare the directories on the management host with externalized Unity-IdM configuration:
+Before running the Ansible script to do the actual installation, you can prepare the directories on the management host with externalized Unity-IdM deliverables:
 
 * create directory with configuration files that will be deployed as `conf` directory to the Unity-IdM instance, and set the `unity.confDir` parameter in the Ansible group variable file,
 * create directory with web contents that will be deployed as `webContents` directory to the Unity-IdM instance, and set the `unity.webContentsDir` parameter in the Ansible group variable file
+* create extra directories with content you would like to deploy to installed instance, and set the `unity.extraDirs` parameter in the Ansible group variable file
 
-Assuming the following directories organization:
+Each of the aforementioned step is optional, but assuming that all are used, then given the following directories structure:
 ```
 $HOME/unity-devops   - root directory with devops tooling
   |_ devops-tooling  - downloaded Unity-IdM Ansible tooling
@@ -98,10 +100,19 @@ $HOME/unity-devops   - root directory with devops tooling
   |_ unity-config
       |_ conf        - configuration files
       |_ webContents - web contents
+      |_ lib-extra1  - extra directory
+      |_ lib-extra2  - extra directory
 ```
 Configure the Ansible group variable values as follows:
 * set `unity.confDir` with `{{inventory_dir}}/unity-config/conf` value,
 * set `unity.webContentsDir` with `{{inventory_dir}}/unity-config/webContents` value
+* set `unity.extraDirs` as shown below
+    ```
+    extraDirs: 
+        - "{{inventory_dir}}/unity-config/lib-extra1"
+        - "{{inventory_dir}}/unity-config/lib-extra2"
+    ```
+    NOTE: after installation, the `lib-extra1` and `lib-extra2` directories will be copied to installed Unity-IdM instance next to `conf`, `webContent` etc.
 
 ### Using Ansible variables in configuration files
 

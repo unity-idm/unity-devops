@@ -1,0 +1,26 @@
+---
+- set_fact:
+    targetDir: "{{installationDir}}/{{item | basename}}"
+- set_fact:
+    sourceDir: "{{item}}"
+
+- name: check if extra dir exists on target instance
+  stat:
+    path: "{{targetDir}}"
+  register: extraDirStatResult
+
+- fail:
+    msg: "Installation of '{{item | basename}}' directory to target instance has failed: distribution already delivers directory with the same name"
+  when: extraDirStatResult.stat.exists == true
+
+- name: Create extra dir
+  file:
+    state: directory
+    path: "{{targetDir}}"
+    mode: '0750'
+
+- name: Setting up extra dir
+  synchronize:
+    src: "{{sourceDir}}/"
+    dest: "{{targetDir}}"
+    mode: push
