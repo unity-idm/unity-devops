@@ -33,6 +33,7 @@
       - "{{unitySourceConfDir}}"
     when: item.state == 'file'
     register: files_stats
+    delegate_to: localhost
 
   - name: Copy template config files to target instance
     template:
