@@ -1,5 +1,5 @@
 installDir: "{{inventory_dir}}/service"
-unityVersion: 3.8.1
+unityVersion: 3.13.1
 
 unity:
   connectivityCheckHost: localhost:2443
